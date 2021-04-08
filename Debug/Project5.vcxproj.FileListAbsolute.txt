@@ -1,0 +1,2 @@
+D:\Code C++\VS2019\Project5\Debug\Project5.exe
+D:\Code C++\VS2019\Project5\Debug\Project5.pdb

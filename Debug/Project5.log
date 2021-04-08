@@ -1,0 +1,4 @@
+﻿  main.cpp
+D:\Code C++\VS2019\Project5\main.cpp(27,15): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+D:\Code C++\VS2019\Project5\main.cpp(45,13): warning C4101: 'high_score': unreferenced local variable
+  Project5.vcxproj -> D:\Code C++\VS2019\Project5\Debug\Project5.exe
