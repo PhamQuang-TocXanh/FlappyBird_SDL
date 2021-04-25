@@ -2,17 +2,22 @@
 
 Obstacles::Obstacles()
 {
-	top = { 0,0,0,0 }; bottom = { 0,0,0,0 };
+	sizer = { 0,0,0,0 };
+	top = { SCREEN_WIDTH,0,0,0 }; bottom = { SCREEN_WIDTH,0,0,0 };
 	increase_bottom = true; increase_top = true;
 	type = 0;
+	lowest_point_t = 0; highest_point_b = SCREEN_HEIGHT;
 }
 
-Obstacles::Obstacles(SDL_Renderer* renderer)
+Obstacles::Obstacles(SDL_Renderer* renderer, int color)
 {
-	top = { 0,0,0,0 }; bottom = { 0,0,0,0 };
+	sizer = { 0,0,0,0 };
+	top = { SCREEN_WIDTH,0,0,0 }; bottom = { SCREEN_WIDTH,0,0,0 };
 	increase_bottom = true; increase_top = true;
 	type = 0;
-	loadImgFromFile("image/pipe.png", renderer);
+	lowest_point_t = 0; highest_point_b = SCREEN_HEIGHT;
+	if (color == 1) loadImgFromFile("image/pipe_p.png", renderer);
+	else loadImgFromFile("image/pipe_b.png", renderer);
 	sizer = getIMG();
 	for (int i = 0; i < 2; i++) {
 		src[i] = { 0,i * sizer.h / 2,sizer.w,sizer.h / 2 };
@@ -33,36 +38,49 @@ void Obstacles::render(SDL_Renderer* renderer)
 void Obstacles::setType(int type)
 {
 	this->type = type;
+	top.h = SCREEN_HEIGHT - DISTANCE_BETWEEN_BLOCK; bottom.h = SCREEN_HEIGHT - DISTANCE_BETWEEN_BLOCK;
+	top.x = SCREEN_WIDTH; bottom.x = SCREEN_WIDTH;
+	top.w = BLOCK_WIDTH; bottom.w = BLOCK_WIDTH;
+	top.y = -rand() % top.h; bottom.y = top.y + top.h + DISTANCE_BETWEEN_BLOCK;
 
-	top = { SCREEN_WIDTH,0,BLOCK_WIDTH,rand() % (SCREEN_HEIGHT - DISTANCE_BETWEEN_BLOCK) };
-	bottom = { SCREEN_WIDTH,top.h + DISTANCE_BETWEEN_BLOCK,BLOCK_WIDTH,0 }; bottom.h = SCREEN_HEIGHT - bottom.y;
+	if (type == 1 || type == 0) {
+		lowest_point_t = rand() % (SCREEN_HEIGHT - DISTANCE_BETWEEN_BLOCK);
+		highest_point_b = lowest_point_t + DISTANCE_BETWEEN_BLOCK;
+	}
+	else if (type == 2) 
+	{
+			increase_top = true; increase_bottom = false;
+	}
+	else if (type == 3) 
+	{
+		increase_top = false; increase_bottom = true;
+	}
 }
 
-void Obstacles::setPosition(int x)
+void Obstacles::setPosition(const int& x)
 {
 	top.x = x; bottom.x = x;
 }
 
-void Obstacles::move(SDL_Renderer* renderer)
+void Obstacles::move()
 {
-	top.x -= 3;
-	bottom.x -= 3;
+	top.x -= vel;
+	bottom.x -= vel;
 	if (type == 1) {
 		if (increase_top) top.y++;
 		else top.y--;
-		if (top.y >= 0) increase_top = false;
-		if (top.y <= -top.h) increase_top = true;
+		if (top.y + top.h >= lowest_point_t) increase_top = false;
+		if (top.y + top.h <= 0) increase_top = true;
 
 		if (increase_bottom) bottom.y--;
 		else bottom.y++;
-		if (bottom.y <= SCREEN_HEIGHT - bottom.h) increase_bottom = false;
+		if (bottom.y <= highest_point_b) increase_bottom = false;
 		if (bottom.y >= SCREEN_HEIGHT) increase_bottom = true;
 	}
 	else if (type == 2) {
 		if (increase_top) {
-			top.h++;
+			top.y++;
 			bottom.y = top.y + top.h + DISTANCE_BETWEEN_BLOCK;
-			bottom.h = SCREEN_HEIGHT - bottom.y;
 			increase_bottom = false;
 			if (bottom.y == SCREEN_HEIGHT) {
 				increase_bottom = true; increase_top = false;
@@ -70,7 +88,7 @@ void Obstacles::move(SDL_Renderer* renderer)
 		}
 
 		if (increase_bottom) {
-			bottom.y--; bottom.h++;
+			bottom.y--; 
 			top.y = bottom.y - DISTANCE_BETWEEN_BLOCK - top.h;
 			increase_top = false;
 			if (top.y + top.h == 0) {
@@ -80,7 +98,7 @@ void Obstacles::move(SDL_Renderer* renderer)
 	}
 	else if (type == 3) {
 		if (increase_bottom) {
-			bottom.y--; bottom.h++;
+			bottom.y--;
 			top.y = bottom.y - DISTANCE_BETWEEN_BLOCK - top.h;
 			increase_top = false;
 			if (top.y + top.h == 0) {
@@ -89,9 +107,8 @@ void Obstacles::move(SDL_Renderer* renderer)
 		}
 
 		if (increase_top) {
-			top.h++;
+			top.y++;
 			bottom.y = top.y + top.h + DISTANCE_BETWEEN_BLOCK;
-			bottom.h = SCREEN_HEIGHT - bottom.y;
 			increase_bottom = false;
 			if (bottom.y == SCREEN_HEIGHT) {
 				increase_bottom = true; increase_top = false;
@@ -99,10 +116,10 @@ void Obstacles::move(SDL_Renderer* renderer)
 		}
 	}
 
-	if (top.x <= 0) {
+	/*if (top.x + top.w <= 0) {
 		top.x = SCREEN_WIDTH; bottom.x = SCREEN_WIDTH;
-		int n = rand() % 3 + 1;
+		int n = rand() % 4;
 		setType(n);
 		std::cout << n << std::endl;
-	}
+	}*/
 }

@@ -9,9 +9,12 @@ public:
     ~Button();
     ButtonSprite currentSprite;
 
-    void setPosition(int x, int y);
+    void setPosition(const int& x, const int& y);
     void handleEvent(SDL_Event* e);
     void render(SDL_Renderer* renderer);
+    void setSize(const int& w, const int& h);
+    int getPositionX() { return position.x; };
+    int getPositionY() { return position.y; };
 
     bool inside;
 private:
