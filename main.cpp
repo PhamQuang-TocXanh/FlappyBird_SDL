@@ -3,6 +3,7 @@
 #include"MainObject.h"
 #include"Button.h"
 #include"Obstacles.h"
+#include"Snow.h"
 using namespace std;
 
 SDL_Window* window = NULL;
@@ -46,7 +47,7 @@ int main(int argc, char* argv[])
 
         Base highScore;
         stringstream highScoreText;
-        int high_score;
+        int high_score = 0;
 
         SDL_Rect window_size = { 0,0,SCREEN_WIDTH,SCREEN_HEIGHT };
         Base menu; menu.loadImgFromFile("image/menu.png", renderer);
@@ -103,13 +104,14 @@ int main(int argc, char* argv[])
 
                 SDL_RenderPresent(renderer);
             }
-            Mix_HaltMusic();
+            
             if (quit_game) continue;
 
             Base press_start; press_start.loadImgFromFile("image/press_to_start.png", renderer);
             int bird_type = 1, backGround_type = 1;
 
             HandleChooseScreen(&e, backGround_type, quit_game, back);
+            Mix_HaltMusic();
             if (quit_game) continue;
 
             Base bg, bg1, bg2, bg3, bg4, bg5;
@@ -134,11 +136,17 @@ int main(int argc, char* argv[])
             bool playAgain = true;
             while (playAgain)
             {
-                time.start();
                 score = 0;
-                Bird flappy(renderer, bird_type);
-                bool newHighScore = false;
-                                
+                Bird flappy(renderer, bird_type); 
+
+                ifstream in;
+                in.open("HighScore.txt");
+                in >> high_score;
+                in.close();
+                highScoreText.str("");
+                highScoreText << "High Score: " << high_score << endl;
+                highScore.loadFromRenderedText(renderer, highScoreText.str().c_str(), "k.ttf", font);
+
                 vector<Obstacles*> ob;
                 Obstacles* p = NULL;
                 for (int i = 0; i < SCREEN_WIDTH / (BLOCK_WIDTH + 170); i++) {
@@ -152,12 +160,17 @@ int main(int argc, char* argv[])
                 s = new Obstacles(renderer, backGround_type); s->setType(rand() % 4);
                 cnv.push_back(s);*/
 
-                ifstream in;
-                in.open("HighScore.txt");
-                in >> high_score;
-                in.close();
+                vector<Snow*> snow;
+                Snow* sn = NULL;
+                for (int i = 0; i < 40; i++) {
+                    sn = new Snow(renderer);
+                    sn->setPosition(rand() % (SCREEN_WIDTH * 2 - 10) + 10, -rand() % (SCREEN_HEIGHT / 2));
+                    sn->setSize(SNOW_SIZE + rand() % SNOW_SIZE * 2);
+                    snow.push_back(sn);
+                }
 
-                bool inGame = true, press_to_start = true;
+                bool inGame = true, press_to_start = true, newHighScore = false, rangeScore = true;
+                time.start();
                 while (inGame) {
                     if (Mix_PlayingMusic() == 0) Mix_PlayMusic(music, -1);
                     capTimer.start();
@@ -178,17 +191,14 @@ int main(int argc, char* argv[])
                         }
                     }
 
-                    timeText.str("");
+                    /*timeText.str("");
                     timeText << "Time: " << time.getTicks() / 1000 << endl;
-                    Time.loadFromRenderedText(renderer, timeText.str().c_str(), "k.ttf", font);
+                    Time.loadFromRenderedText(renderer, timeText.str().c_str(), "k.ttf", font);*/
+                    
                     scoreText.str("");
                     scoreText << score << endl;
                     Scoreb.loadFromRenderedText(renderer, scoreText.str().c_str(), "k.ttf", font, 60);
                     Scoref.loadFromRenderedText(renderer, scoreText.str().c_str(), "k.ttf", font, 60);
-                    highScoreText.str("");
-                    highScoreText << "High Score: " << high_score << endl;
-                    highScore.loadFromRenderedText(renderer, highScoreText.str().c_str(), "k.ttf", font);
-
 
                     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
                     SDL_RenderClear(renderer);
@@ -211,10 +221,18 @@ int main(int argc, char* argv[])
                     if (scroll3 < -SCREEN_WIDTH) scroll3 = 0;
                     scroll4 -= 1.1;
                     if(scroll4 < -SCREEN_WIDTH) scroll4 = 0;
-                                                            
+                             
+                    int nearest = SCREEN_WIDTH;
                     for (int i = 0; i < ob.size(); i++) {
-                        if (flappy.Pass_Obstacle(ob.at(i), pass_sound) == true) score++;
+                        if (flappy.Pass_Obstacle(ob.at(i), pass_sound) == true && rangeScore == true) {
+                            score++;
+                            rangeScore = false;
+                        }
+                        if (ob.at(i)->getPosition() + BLOCK_WIDTH < nearest) {
+                            nearest = ob.at(i)->getPosition() + BLOCK_WIDTH;
+                        }
                     }
+                    if (BIRD_WIDTH >= nearest) rangeScore = true;
                     /*for (int i = 0; i < cnv.size(); i++) {
                         if (flappy.Pass_Obstacle(cnv.at(i), pass_sound) == true) score++;
                     }*/
@@ -241,7 +259,7 @@ int main(int argc, char* argv[])
                                 if(i!=0) ob.at(i)->setPosition(ob.at(i - 1)->getPosition() + BLOCK_WIDTH + 170);
                                 else
                                 {
-                                    ob.at(0)->setPosition(ob.at(3)->getPosition() + BLOCK_WIDTH + 170);
+                                    ob.at(0)->setPosition(ob.at(ob.size() - 1)->getPosition() + BLOCK_WIDTH + 170);
                                 }
                             }
                         }
@@ -265,7 +283,7 @@ int main(int argc, char* argv[])
                             SDL_Rect score_size = Scoreb.getIMG(), highscore_size=highScore.getIMG();
                             Scoreb.Render(SCREEN_WIDTH / 2 - score_size.w / 2, 100, renderer);
                             Scoref.Render(SCREEN_WIDTH / 2 - score_size.w / 2 - 3, 100 - 3, renderer);
-                            Time.Render(SCREEN_WIDTH - highscore_size.w - 10, highscore_size.h, renderer);
+                            /*Time.Render(SCREEN_WIDTH - highscore_size.w - 10, highscore_size.h, renderer);*/
                             highScore.Render(SCREEN_WIDTH - highscore_size.w - 10, 0, renderer);
                         }
                         else
@@ -275,8 +293,16 @@ int main(int argc, char* argv[])
                             SDL_Delay(100);
                             HandlePlayAgain(again, &e, exit2, inGame, playAgain, quit_game, score, newHighScore);
                         }
-                    }                 
- 
+                    }       
+
+                    for (int i = 0; i < snow.size(); i++) {
+                        snow.at(i)->render(renderer);
+                        snow.at(i)->fall();
+                        if (snow.at(i)->outScreen()) {
+                            snow.at(i)->setPosition(rand() % (SCREEN_WIDTH * 2 - 10) + 10, -rand() % (SCREEN_HEIGHT / 2)); 
+                            sn->setSize(SNOW_SIZE + rand() % SNOW_SIZE * 2);
+                        }
+                    }
 
                     SDL_RenderPresent(renderer);
                     countedFrames++;
@@ -287,7 +313,9 @@ int main(int argc, char* argv[])
                 for (vector<Obstacles*>::iterator i = ob.begin(); i != ob.end(); i++) {
                     delete* i;
                 } ob.clear();
-
+                for (vector<Snow*>::iterator i = snow.begin(); i != snow.end(); i++) {
+                    delete* i;
+                } snow.clear();
                 /*for (vector<Obstacles*>::iterator i = cnv.begin(); i != cnv.end(); i++) {
                     delete* i;
                 } cnv.clear();*/

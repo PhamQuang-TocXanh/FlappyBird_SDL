@@ -48,9 +48,9 @@ void Bird::handleEvent(SDL_Event& e, Mix_Chunk* jump_sound)
         {
             switch (e.key.keysym.sym)
             {
-            case SDLK_DOWN: case SDLK_s: vel_y += velocity; break;
+            /*case SDLK_DOWN: case SDLK_s: vel_y += velocity; break;
             case SDLK_LEFT: case SDLK_a: vel_x -= velocity; break;
-            case SDLK_RIGHT: case SDLK_d: vel_x += velocity; break;
+            case SDLK_RIGHT: case SDLK_d: vel_x += velocity; break;*/
             case SDLK_SPACE: case SDLK_UP: vel_y -= 15; Mix_PlayChannel(-1, jump_sound, 0); gravity = 0; angle = -30; jump = true; break;
             }
         }
@@ -58,9 +58,9 @@ void Bird::handleEvent(SDL_Event& e, Mix_Chunk* jump_sound)
         {
             switch (e.key.keysym.sym)
             {
-            case SDLK_DOWN: case SDLK_s: vel_y -= velocity; break;
+            /*case SDLK_DOWN: case SDLK_s: vel_y -= velocity; break;
             case SDLK_LEFT: case SDLK_a: vel_x += velocity; break;
-            case SDLK_RIGHT: case SDLK_d: vel_x -= velocity; break;
+            case SDLK_RIGHT: case SDLK_d: vel_x -= velocity; break;*/
             case SDLK_SPACE: case SDLK_UP: vel_y += 15; gravity = 0; jump = false; break;
             }
         }

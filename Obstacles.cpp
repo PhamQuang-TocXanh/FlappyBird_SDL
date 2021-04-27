@@ -77,7 +77,7 @@ void Obstacles::move()
 		if (bottom.y <= highest_point_b) increase_bottom = false;
 		if (bottom.y >= SCREEN_HEIGHT) increase_bottom = true;
 	}
-	else if (type == 2) {
+	else if (type == 2 || type == 3) {
 		if (increase_top) {
 			top.y++;
 			bottom.y = top.y + top.h + DISTANCE_BETWEEN_BLOCK;
@@ -93,25 +93,6 @@ void Obstacles::move()
 			increase_top = false;
 			if (top.y + top.h == 0) {
 				increase_bottom = false; increase_top = true;
-			}
-		}
-	}
-	else if (type == 3) {
-		if (increase_bottom) {
-			bottom.y--;
-			top.y = bottom.y - DISTANCE_BETWEEN_BLOCK - top.h;
-			increase_top = false;
-			if (top.y + top.h == 0) {
-				increase_bottom = false; increase_top = true;
-			}
-		}
-
-		if (increase_top) {
-			top.y++;
-			bottom.y = top.y + top.h + DISTANCE_BETWEEN_BLOCK;
-			increase_bottom = false;
-			if (bottom.y == SCREEN_HEIGHT) {
-				increase_bottom = true; increase_top = false;
 			}
 		}
 	}

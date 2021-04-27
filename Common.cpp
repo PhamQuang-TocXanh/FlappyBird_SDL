@@ -84,7 +84,7 @@ bool loadSound(Mix_Chunk*& jump, Mix_Music*& inGamemusic, Mix_Chunk*& pass, Mix_
 		cerr << "Unable to load jump sound effect! SDL_mixer Error: " << Mix_GetError() << endl;
 		loadOkay = false;
 	}
-	inGamemusic = Mix_LoadMUS("sound/Tayto.wav");
+	inGamemusic = Mix_LoadMUS("sound/ms.wav");
 	if (inGamemusic == NULL) {
 		cerr << "Unable to load music! SDL_mixer Error: " << Mix_GetError() << endl;
 		loadOkay = false;
@@ -99,7 +99,7 @@ bool loadSound(Mix_Chunk*& jump, Mix_Music*& inGamemusic, Mix_Chunk*& pass, Mix_
 		cerr << "Unable to load game over sound effect! SDL_mixer Error: " << Mix_GetError() << endl;
 		loadOkay = false;
 	}
-	bgmusic = Mix_LoadMUS("sound/NTDVH.wav");
+	bgmusic = Mix_LoadMUS("sound/menu_music.wav");
 	if (bgmusic == NULL) {
 		cerr << "Unable to load background music in menu! SDL_mixer Error: " << Mix_GetError() << endl;
 		loadOkay = false;
@@ -121,7 +121,7 @@ bool checkCollision(SDL_Rect collider, SDL_Rect top, SDL_Rect bottom)
 {
 	if (collider.x + collider.w < top.x || collider.x + collider.w < bottom.x) return false;
 	if (collider.x > top.x + top.w || collider.x > bottom.x + bottom.w) return false;
-	if (collider.y + collider.h - 4 < bottom.y && collider.y + 15 > top.y + top.h) return false;
+	if (collider.y + collider.h - 4 < bottom.y && collider.y + 10 > top.y + top.h) return false;
 
 	return true;
 }

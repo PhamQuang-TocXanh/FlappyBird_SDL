@@ -22,7 +22,8 @@ const int BUTTON_HEIGHT = 100;
 const int BIRD_WIDTH = 64;
 const int BIRD_HEIGHT = 48;
 const int BLOCK_WIDTH = 80;
-const int DISTANCE_BETWEEN_BLOCK = 175;
+const int DISTANCE_BETWEEN_BLOCK = 150;
+const int SNOW_SIZE = 10;
 
 
 bool initSDL(SDL_Window*& window, SDL_Renderer*& renderer);

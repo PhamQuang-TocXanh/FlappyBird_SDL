@@ -20,6 +20,6 @@ private:
 	SDL_Rect top, bottom;
 	SDL_Rect sizer, src[2];
 	bool increase_top, increase_bottom;
-	int type, vel = 4;
+	int type, vel = 3;
 	int lowest_point_t, highest_point_b;
 };
